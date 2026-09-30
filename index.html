@@ -1,330 +1,1374 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Buscador de Portadas y Canciones</title>
+
+  <title>Music Cover Studio</title>
+
   <style>
     :root {
-      --bg: #121214;
-      --card-bg: #202024;
-      --accent: #1db954;
+      --bg: #07080d;
+      --bg-secondary: #0d1018;
+      --card: rgba(19, 23, 34, 0.82);
+
+      --primary: #7c3cff;
+      --primary-light: #a66cff;
+      --secondary: #00e5ff;
+      --accent: #19f5a1;
+
       --text: #ffffff;
-      --text-muted: #a8a8b3;
-      --link-btn: #323238;
+      --text-secondary: #b8bfce;
+      --text-muted: #70798c;
+
+      --border: rgba(255, 255, 255, 0.08);
+      --glass: rgba(255, 255, 255, 0.045);
+
+      --shadow:
+        0 20px 50px rgba(0, 0, 0, 0.45);
+
+      --glow:
+        0 0 35px rgba(124, 60, 255, 0.22);
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+    }
+
+    html {
+      scroll-behavior: smooth;
     }
 
     body {
-      background-color: var(--bg);
-      color: var(--text);
-      padding: 2rem 1rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
       min-height: 100vh;
+      color: var(--text);
+
+      background:
+        radial-gradient(
+          circle at 15% 10%,
+          rgba(124, 60, 255, 0.16),
+          transparent 30%
+        ),
+        radial-gradient(
+          circle at 85% 20%,
+          rgba(0, 229, 255, 0.10),
+          transparent 28%
+        ),
+        radial-gradient(
+          circle at 50% 100%,
+          rgba(25, 245, 161, 0.07),
+          transparent 30%
+        ),
+        var(--bg);
+
+      padding: 45px 25px 70px;
+      overflow-x: hidden;
     }
 
+    /* =========================
+       BACKGROUND EFFECT
+    ========================= */
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+
+      pointer-events: none;
+
+      background-image:
+        linear-gradient(
+          rgba(255,255,255,0.018) 1px,
+          transparent 1px
+        ),
+        linear-gradient(
+          90deg,
+          rgba(255,255,255,0.018) 1px,
+          transparent 1px
+        );
+
+      background-size: 45px 45px;
+
+      mask-image:
+        linear-gradient(
+          to bottom,
+          black,
+          transparent 85%
+        );
+
+      z-index: -1;
+    }
+
+    /* =========================
+       HEADER
+    ========================= */
+
     header {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto 38px;
       text-align: center;
-      margin-bottom: 2rem;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+
+      padding: 8px 16px;
+
+      border: 1px solid rgba(124, 60, 255, 0.28);
+      background: rgba(124, 60, 255, 0.08);
+
+      border-radius: 50px;
+
+      color: var(--primary-light);
+
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+
+      box-shadow:
+        0 0 25px rgba(124, 60, 255, 0.08);
+
+      margin-bottom: 20px;
+    }
+
+    .brand-dot {
+      width: 7px;
+      height: 7px;
+
+      background: var(--accent);
+      border-radius: 50%;
+
+      box-shadow:
+        0 0 12px var(--accent);
+
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.5;
+        transform: scale(0.7);
+      }
     }
 
     h1 {
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      font-weight: 900;
+      letter-spacing: -2px;
+      line-height: 1.05;
+
+      background:
+        linear-gradient(
+          110deg,
+          #ffffff 15%,
+          #b58cff 50%,
+          #00e5ff 85%
+        );
+
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+
+      margin-bottom: 14px;
     }
 
-    .badge {
-      display: inline-block;
-      background: #2e2e35;
-      color: var(--accent);
-      padding: 0.2rem 0.6rem;
-      border-radius: 4px;
-      font-size: 0.8rem;
-      font-weight: bold;
-      margin-top: 0.4rem;
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 15px;
+      max-width: 600px;
+      margin: auto;
+      line-height: 1.7;
+    }
+
+    /* =========================
+       SEARCH
+    ========================= */
+
+    .search-wrapper {
+      width: 100%;
+      max-width: 850px;
+      margin: 0 auto 35px;
     }
 
     .search-container {
       display: flex;
-      gap: 0.5rem;
+      gap: 10px;
+
       width: 100%;
-      max-width: 600px;
-      margin-bottom: 2rem;
+
+      padding: 8px;
+
+      background:
+        linear-gradient(
+          135deg,
+          rgba(255,255,255,0.08),
+          rgba(255,255,255,0.025)
+        );
+
+      border: 1px solid var(--border);
+
+      border-radius: 18px;
+
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+
+      box-shadow:
+        0 15px 50px rgba(0,0,0,0.35),
+        var(--glow);
+
+      transition: 0.3s ease;
+    }
+
+    .search-container:focus-within {
+      border-color: rgba(124, 60, 255, 0.55);
+
+      box-shadow:
+        0 15px 60px rgba(0,0,0,0.4),
+        0 0 35px rgba(124,60,255,0.15);
+    }
+
+    .search-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      width: 50px;
+
+      color: var(--text-muted);
+      font-size: 20px;
     }
 
     input[type="text"] {
       flex: 1;
-      padding: 0.8rem 1.2rem;
-      border-radius: 8px;
-      border: 1px solid #323238;
-      background-color: var(--card-bg);
-      color: var(--text);
-      font-size: 1rem;
+
+      min-width: 0;
+
+      border: none;
       outline: none;
+
+      background: transparent;
+
+      color: white;
+
+      font-size: 15px;
+      font-weight: 500;
     }
 
-    input[type="text"]:focus {
-      border-color: var(--accent);
+    input[type="text"]::placeholder {
+      color: #667084;
     }
 
     button.search-btn {
-      background-color: var(--accent);
-      color: #000;
       border: none;
-      padding: 0.8rem 1.5rem;
-      font-weight: bold;
-      border-radius: 8px;
+      outline: none;
+
+      padding: 0 28px;
+
+      min-height: 52px;
+
+      border-radius: 13px;
+
+      color: white;
+
+      font-size: 14px;
+      font-weight: 800;
+
       cursor: pointer;
-      transition: opacity 0.2s;
+
+      background:
+        linear-gradient(
+          135deg,
+          var(--primary),
+          #5b28db 55%,
+          #3f20a5
+        );
+
+      box-shadow:
+        0 8px 25px rgba(124,60,255,0.3);
+
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
     }
 
     button.search-btn:hover {
-      opacity: 0.9;
+      transform: translateY(-2px);
+
+      box-shadow:
+        0 12px 35px rgba(124,60,255,0.45);
+    }
+
+    button.search-btn:active {
+      transform: scale(0.97);
+    }
+
+    /* =========================
+       STATUS
+    ========================= */
+
+    .status-bar {
+      width: 100%;
+      max-width: 1200px;
+
+      margin: 0 auto 25px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      color: var(--text-muted);
+
+      font-size: 12px;
     }
 
     #loading {
       display: none;
-      margin: 1.5rem 0;
-      color: var(--accent);
-      font-weight: 500;
+
+      align-items: center;
+      gap: 10px;
+
+      color: var(--secondary);
+
+      font-size: 13px;
+      font-weight: 700;
     }
+
+    .loader {
+      width: 15px;
+      height: 15px;
+
+      border-radius: 50%;
+
+      border:
+        2px solid rgba(0,229,255,0.2);
+
+      border-top-color: var(--secondary);
+
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    #result-count {
+      color: var(--text-muted);
+    }
+
+    /* =========================
+       GRID
+    ========================= */
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-      gap: 1.5rem;
+
+      grid-template-columns:
+        repeat(
+          auto-fill,
+          minmax(220px, 1fr)
+        );
+
+      gap: 22px;
+
       width: 100%;
       max-width: 1200px;
+
+      margin: auto;
     }
 
+    /* =========================
+       CARD
+    ========================= */
+
     .card {
-      background-color: var(--card-bg);
-      border-radius: 10px;
-      padding: 1rem;
+      position: relative;
+
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+
+      overflow: hidden;
+
+      padding: 12px;
+
+      background:
+        linear-gradient(
+          145deg,
+          rgba(255,255,255,0.075),
+          rgba(255,255,255,0.025)
+        );
+
+      border: 1px solid var(--border);
+
+      border-radius: 20px;
+
+      box-shadow: var(--shadow);
+
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+
+      transition:
+        transform 0.35s cubic-bezier(.2,.8,.2,1),
+        border-color 0.35s ease,
+        box-shadow 0.35s ease;
+
+      animation: cardIn 0.5s ease both;
+    }
+
+    @keyframes cardIn {
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .card:hover {
+      transform: translateY(-7px);
+
+      border-color:
+        rgba(124,60,255,0.45);
+
+      box-shadow:
+        0 25px 55px rgba(0,0,0,0.55),
+        0 0 35px rgba(124,60,255,0.12);
+    }
+
+    /* =========================
+       COVER
+    ========================= */
+
+    .cover-wrapper {
+      position: relative;
+
+      width: 100%;
+
+      aspect-ratio: 1 / 1;
+
+      overflow: hidden;
+
+      border-radius: 14px;
+
+      background: #050609;
     }
 
     .card img {
       width: 100%;
-      aspect-ratio: 1 / 1;
-      border-radius: 6px;
+      height: 100%;
+
       object-fit: cover;
-      background-color: #000;
+
+      display: block;
+
+      transition:
+        transform 0.5s cubic-bezier(.2,.8,.2,1);
     }
 
+    .card:hover img {
+      transform: scale(1.055);
+    }
+
+    .cover-wrapper::after {
+      content: "";
+
+      position: absolute;
+
+      inset: 0;
+
+      pointer-events: none;
+
+      background:
+        linear-gradient(
+          to top,
+          rgba(0,0,0,0.5),
+          transparent 40%
+        );
+
+      opacity: 0;
+
+      transition: opacity 0.3s ease;
+    }
+
+    .card:hover .cover-wrapper::after {
+      opacity: 1;
+    }
+
+    /* =========================
+       CARD INFO
+    ========================= */
+
     .card-info {
-      flex: 1;
+      padding: 15px 4px 10px;
+      min-width: 0;
     }
 
     .card-title {
-      font-weight: bold;
-      font-size: 0.95rem;
+      color: #ffffff;
+
+      font-size: 15px;
+      font-weight: 800;
+
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      margin-bottom: 0.2rem;
+
+      margin-bottom: 6px;
     }
 
-    .card-artist, .card-album {
-      font-size: 0.8rem;
+    .card-artist {
+      color: #c5cad5;
+
+      font-size: 13px;
+      font-weight: 600;
+
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      margin-bottom: 4px;
+    }
+
+    .card-album {
       color: var(--text-muted);
+
+      font-size: 11px;
+
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
+
+    /* =========================
+       ACTIONS
+    ========================= */
 
     .actions-container {
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+
+      gap: 8px;
+
+      padding: 0 2px 2px;
+    }
+
+    .download-btn,
+    .song-link-btn {
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+
+      width: 100%;
+
+      min-height: 42px;
+
+      border-radius: 11px;
+
+      font-size: 12px;
+      font-weight: 800;
+
+      cursor: pointer;
+
+      transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
     }
 
     .download-btn {
-      display: block;
-      width: 100%;
-      text-align: center;
-      background-color: var(--accent);
-      color: #000;
-      padding: 0.6rem;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      font-weight: bold;
       border: none;
-      cursor: pointer;
-      transition: all 0.2s;
+
+      color: #ffffff;
+
+      background:
+        linear-gradient(
+          135deg,
+          #7c3cff,
+          #5422c7
+        );
+
+      box-shadow:
+        0 7px 20px rgba(124,60,255,0.18);
     }
 
     .download-btn:hover {
-      opacity: 0.9;
+      transform: translateY(-2px);
+
+      box-shadow:
+        0 10px 28px rgba(124,60,255,0.35);
     }
 
     .song-link-btn {
-      display: block;
-      width: 100%;
-      text-align: center;
-      background-color: var(--link-btn);
-      color: var(--text);
+      color: #dce1eb;
+
       text-decoration: none;
-      padding: 0.55rem;
-      border-radius: 6px;
-      font-size: 0.82rem;
-      font-weight: 500;
-      transition: background-color 0.2s, color 0.2s;
+
+      border:
+        1px solid rgba(255,255,255,0.07);
+
+      background:
+        rgba(255,255,255,0.045);
     }
 
     .song-link-btn:hover {
-      background-color: #44444c;
-      color: #fff;
+      transform: translateY(-2px);
+
+      color: white;
+
+      border-color:
+        rgba(0,229,255,0.25);
+
+      background:
+        rgba(0,229,255,0.08);
+    }
+
+    /* =========================
+       EMPTY STATE
+    ========================= */
+
+    .empty-state {
+      grid-column: 1 / -1;
+
+      padding: 70px 20px;
+
+      text-align: center;
+
+      border:
+        1px solid rgba(255,255,255,0.06);
+
+      border-radius: 20px;
+
+      background:
+        rgba(255,255,255,0.025);
+    }
+
+    .empty-icon {
+      font-size: 40px;
+      margin-bottom: 15px;
+      opacity: 0.7;
+    }
+
+    .empty-title {
+      font-size: 17px;
+      font-weight: 800;
+
+      margin-bottom: 7px;
+    }
+
+    .empty-text {
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    /* =========================
+       FOOTER
+    ========================= */
+
+    footer {
+      width: 100%;
+      max-width: 1200px;
+
+      margin: 50px auto 0;
+
+      padding-top: 20px;
+
+      border-top:
+        1px solid rgba(255,255,255,0.06);
+
+      text-align: center;
+
+      color: #4f5869;
+
+      font-size: 11px;
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media (max-width: 650px) {
+
+      body {
+        padding:
+          30px 14px 50px;
+      }
+
+      h1 {
+        letter-spacing: -1px;
+      }
+
+      .subtitle {
+        font-size: 13px;
+      }
+
+      .search-container {
+        padding: 6px;
+        border-radius: 15px;
+      }
+
+      .search-icon {
+        display: none;
+      }
+
+      input[type="text"] {
+        padding-left: 12px;
+        font-size: 14px;
+      }
+
+      button.search-btn {
+        padding: 0 18px;
+        min-height: 46px;
+      }
+
+      .grid {
+        grid-template-columns:
+          repeat(2, minmax(0, 1fr));
+
+        gap: 12px;
+      }
+
+      .card {
+        padding: 8px;
+        border-radius: 15px;
+      }
+
+      .cover-wrapper {
+        border-radius: 10px;
+      }
+
+      .card-info {
+        padding:
+          11px 3px 8px;
+      }
+
+      .card-title {
+        font-size: 13px;
+      }
+
+      .card-artist {
+        font-size: 11px;
+      }
+
+      .card-album {
+        font-size: 10px;
+      }
+
+      .download-btn,
+      .song-link-btn {
+        min-height: 37px;
+        font-size: 10px;
+      }
+    }
+
+    @media (max-width: 380px) {
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .search-container {
+        flex-direction: column;
+      }
+
+      button.search-btn {
+        width: 100%;
+      }
     }
   </style>
 </head>
+
 <body>
 
+  <!-- HEADER -->
   <header>
-    <h1>Buscador de Portadas y Canciones</h1>
-    <div>
-     
+
+    <div class="brand">
+      <span class="brand-dot"></span>
+      MUSIC COVER STUDIO
     </div>
+
+    <h1>Buscador de Portadas</h1>
+
+    <p class="subtitle">
+      Encuentra portadas de alta resolución y accede directamente
+      a tus canciones favoritas.
+    </p>
+
   </header>
 
-  <div class="search-container">
-    <input 
-      type="text" 
-      id="search-input" 
-      placeholder="Escribe canción o artista (ej: Daft Punk, Bad Bunny)..." 
-      autofocus
-    />
-    <button class="search-btn" id="search-btn">Buscar</button>
+
+  <!-- SEARCH -->
+  <div class="search-wrapper">
+
+    <div class="search-container">
+
+      <div class="search-icon">
+        🔎
+      </div>
+
+      <input
+        type="text"
+        id="search-input"
+        placeholder="Busca una canción, artista o álbum..."
+        autofocus
+      />
+
+      <button
+        class="search-btn"
+        id="search-btn"
+      >
+        BUSCAR
+      </button>
+
+    </div>
+
   </div>
 
-  <div id="loading">Buscando...</div>
 
-  <main class="grid" id="results-grid"></main>
+  <!-- STATUS -->
+  <div class="status-bar">
+
+    <div id="loading">
+
+      <span class="loader"></span>
+
+      Buscando música...
+
+    </div>
+
+    <div id="result-count"></div>
+
+  </div>
+
+
+  <!-- RESULTS -->
+  <main
+    class="grid"
+    id="results-grid"
+  ></main>
+
+
+  <!-- FOOTER -->
+  <footer>
+    Music Cover Studio · Buscador multimedia
+  </footer>
+
 
   <script>
-    const searchInput = document.getElementById('search-input');
-    const searchBtn = document.getElementById('search-btn');
-    const resultsGrid = document.getElementById('results-grid');
-    const loading = document.getElementById('loading');
+
+    const searchInput =
+      document.getElementById('search-input');
+
+    const searchBtn =
+      document.getElementById('search-btn');
+
+    const resultsGrid =
+      document.getElementById('results-grid');
+
+    const loading =
+      document.getElementById('loading');
+
+    const resultCount =
+      document.getElementById('result-count');
+
+
+    /* =========================
+       ITUNES CALLBACK
+    ========================= */
 
     window.itunesCallback = function(data) {
+
       loading.style.display = 'none';
+
       resultsGrid.innerHTML = '';
 
-      if (!data.results || data.results.length === 0) {
-        resultsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No se encontraron resultados.</p>';
+      resultCount.textContent = '';
+
+
+      if (
+        !data.results ||
+        data.results.length === 0
+      ) {
+
+        resultsGrid.innerHTML = `
+
+          <div class="empty-state">
+
+            <div class="empty-icon">
+              🎵
+            </div>
+
+            <div class="empty-title">
+              No encontramos resultados
+            </div>
+
+            <div class="empty-text">
+              Intenta buscar con otro artista,
+              canción o álbum.
+            </div>
+
+          </div>
+
+        `;
+
         return;
       }
 
-      data.results.forEach(item => {
-        if (!item.artworkUrl100) return;
 
-        const hdCoverUrl = item.artworkUrl100.replace('100x100bb', '1400x1400bb');
-        const songName = item.trackName || item.collectionName || 'Canción';
-        const artistName = item.artistName || 'Artista';
-        const fileName = `${artistName} - ${songName}`.replace(/[/\\?%*:|"<>]/g, '-');
-        
-        // Link directo a la canción en Apple Music (o al álbum si no hay track individual)
-        const songLink = item.trackViewUrl || item.collectionViewUrl || '#';
+      const validResults =
+        data.results.filter(
+          item => item.artworkUrl100
+        );
 
-        const card = document.createElement('div');
+
+      resultCount.textContent =
+        `${validResults.length} resultados encontrados`;
+
+
+      validResults.forEach((item, index) => {
+
+        const hdCoverUrl =
+          item.artworkUrl100.replace(
+            '100x100bb',
+            '1400x1400bb'
+          );
+
+
+        const songName =
+          item.trackName ||
+          item.collectionName ||
+          'Canción';
+
+
+        const artistName =
+          item.artistName ||
+          'Artista';
+
+
+        const albumName =
+          item.collectionName ||
+          '';
+
+
+        const fileName =
+          `${artistName} - ${songName}`
+          .replace(
+            /[/\\?%*:|"<>]/g,
+            '-'
+          );
+
+
+        const songLink =
+          item.trackViewUrl ||
+          item.collectionViewUrl ||
+          '#';
+
+
+        const card =
+          document.createElement('div');
+
+
         card.className = 'card';
+
+
+        card.style.animationDelay =
+          `${Math.min(index * 0.04, 0.5)}s`;
+
+
         card.innerHTML = `
-          <img src="${hdCoverUrl}" alt="Cover" loading="lazy" />
+
+          <div class="cover-wrapper">
+
+            <img
+              src="${hdCoverUrl}"
+              alt="${songName}"
+              loading="lazy"
+            />
+
+          </div>
+
+
           <div class="card-info">
-            <div class="card-title" title="${songName}">${songName}</div>
-            <div class="card-artist" title="${artistName}">${artistName}</div>
-            <div class="card-album" title="${item.collectionName || ''}">${item.collectionName || ''}</div>
+
+            <div
+              class="card-title"
+              title="${songName}"
+            >
+              ${songName}
+            </div>
+
+
+            <div
+              class="card-artist"
+              title="${artistName}"
+            >
+              ${artistName}
+            </div>
+
+
+            <div
+              class="card-album"
+              title="${albumName}"
+            >
+              ${albumName}
+            </div>
+
           </div>
+
+
           <div class="actions-container">
-            <button class="download-btn" onclick="saveAsJpg('${hdCoverUrl}', '${fileName}', this)">
-              Descargar JPG 1:1
+
+            <button
+              class="download-btn"
+              onclick="saveAsJpg(
+                '${hdCoverUrl}',
+                '${fileName}',
+                this
+              )"
+            >
+              ↓ &nbsp; DESCARGAR JPG 1:1
             </button>
-            <a href="${songLink}" target="_blank" rel="noopener noreferrer" class="song-link-btn">
-              🔗 Abrir canción
+
+
+            <a
+              href="${songLink}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="song-link-btn"
+            >
+              ↗ &nbsp; ABRIR CANCIÓN
             </a>
+
           </div>
+
         `;
+
+
         resultsGrid.appendChild(card);
+
       });
+
     };
 
+
+    /* =========================
+       SEARCH
+    ========================= */
+
     function searchCovers() {
-      const query = searchInput.value.trim();
-      if (!query) return;
 
-      loading.style.display = 'block';
+      const query =
+        searchInput.value.trim();
 
-      const oldScript = document.getElementById('itunes-jsonp');
-      if (oldScript) oldScript.remove();
 
-      const script = document.createElement('script');
-      script.id = 'itunes-jsonp';
-      script.src = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=24&callback=itunesCallback`;
-      
+      if (!query) {
+
+        searchInput.focus();
+
+        return;
+      }
+
+
+      loading.style.display =
+        'flex';
+
+
+      resultCount.textContent =
+        '';
+
+
+      resultsGrid.innerHTML =
+        '';
+
+
+      const oldScript =
+        document.getElementById(
+          'itunes-jsonp'
+        );
+
+
+      if (oldScript)
+        oldScript.remove();
+
+
+      const script =
+        document.createElement(
+          'script'
+        );
+
+
+      script.id =
+        'itunes-jsonp';
+
+
+      script.src =
+        `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=24&callback=itunesCallback`;
+
+
       script.onerror = () => {
-        loading.style.display = 'none';
-        alert('Error al conectar con el servicio.');
+
+        loading.style.display =
+          'none';
+
+
+        resultsGrid.innerHTML = `
+
+          <div class="empty-state">
+
+            <div class="empty-icon">
+              ⚠️
+            </div>
+
+            <div class="empty-title">
+              No se pudo conectar
+            </div>
+
+            <div class="empty-text">
+              Verifica tu conexión e intenta nuevamente.
+            </div>
+
+          </div>
+
+        `;
+
       };
 
-      document.body.appendChild(script);
+
+      document.body.appendChild(
+        script
+      );
+
     }
 
-    function saveAsJpg(imgUrl, filename, btn) {
-      btn.innerText = 'Descargando...';
 
-      const proxiedUrl = `https://images.weserv.nl/?url=${encodeURIComponent(imgUrl)}&output=jpg&q=100`;
+    /* =========================
+       DOWNLOAD JPG
+    ========================= */
 
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.src = proxiedUrl;
+    function saveAsJpg(
+      imgUrl,
+      filename,
+      btn
+    ) {
+
+      const originalText =
+        btn.innerText;
+
+
+      btn.innerText =
+        '⏳ PROCESANDO...';
+
+
+      btn.disabled =
+        true;
+
+
+      const proxiedUrl =
+        `https://images.weserv.nl/?url=${encodeURIComponent(imgUrl)}&output=jpg&q=100`;
+
+
+      const img =
+        new Image();
+
+
+      img.crossOrigin =
+        'anonymous';
+
+
+      img.src =
+        proxiedUrl;
+
 
       img.onload = () => {
-        const size = Math.min(img.naturalWidth, img.naturalHeight);
-        const canvas = document.createElement('canvas');
-        canvas.width = size;
-        canvas.height = size;
-        const ctx = canvas.getContext('2d');
 
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(0, 0, size, size);
+        const size =
+          Math.min(
+            img.naturalWidth,
+            img.naturalHeight
+          );
 
-        const sx = (img.naturalWidth - size) / 2;
-        const sy = (img.naturalHeight - size) / 2;
-        ctx.drawImage(img, sx, sy, size, size, 0, 0, size, size);
 
-        canvas.toBlob((blob) => {
-          const a = document.createElement('a');
-          a.href = URL.createObjectURL(blob);
-          a.download = `${filename}.jpg`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          btn.innerText = 'Descargar JPG 1:1';
-        }, 'image/jpeg', 1.0);
+        const canvas =
+          document.createElement(
+            'canvas'
+          );
+
+
+        canvas.width =
+          size;
+
+
+        canvas.height =
+          size;
+
+
+        const ctx =
+          canvas.getContext('2d');
+
+
+        ctx.fillStyle =
+          '#FFFFFF';
+
+
+        ctx.fillRect(
+          0,
+          0,
+          size,
+          size
+        );
+
+
+        const sx =
+          (img.naturalWidth - size) / 2;
+
+
+        const sy =
+          (img.naturalHeight - size) / 2;
+
+
+        ctx.drawImage(
+          img,
+          sx,
+          sy,
+          size,
+          size,
+          0,
+          0,
+          size,
+          size
+        );
+
+
+        canvas.toBlob(
+          (blob) => {
+
+            const a =
+              document.createElement(
+                'a'
+              );
+
+
+            a.href =
+              URL.createObjectURL(
+                blob
+              );
+
+
+            a.download =
+              `${filename}.jpg`;
+
+
+            document.body.appendChild(
+              a
+            );
+
+
+            a.click();
+
+
+            document.body.removeChild(
+              a
+            );
+
+
+            URL.revokeObjectURL(
+              a.href
+            );
+
+
+            btn.innerText =
+              '✓ DESCARGADO';
+
+
+            setTimeout(() => {
+
+              btn.innerText =
+                originalText;
+
+              btn.disabled =
+                false;
+
+            }, 1800);
+
+          },
+          'image/jpeg',
+          1.0
+        );
+
       };
+
 
       img.onerror = () => {
-        window.open(imgUrl, '_blank');
-        btn.innerText = 'Descargar JPG 1:1';
+
+        window.open(
+          imgUrl,
+          '_blank'
+        );
+
+
+        btn.innerText =
+          originalText;
+
+
+        btn.disabled =
+          false;
+
       };
+
     }
 
-    searchBtn.addEventListener('click', searchCovers);
-    searchInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') searchCovers();
-    });
+
+    /* =========================
+       EVENTS
+    ========================= */
+
+    searchBtn.addEventListener(
+      'click',
+      searchCovers
+    );
+
+
+    searchInput.addEventListener(
+      'keypress',
+      (e) => {
+
+        if (e.key === 'Enter') {
+
+          searchCovers();
+
+        }
+
+      }
+    );
+
   </script>
+
 </body>
 </html>
+```
